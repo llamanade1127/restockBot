@@ -1,10 +1,9 @@
-var Twitter = require('twitter');
+
 const rp = require('request-promise');
 const cheerio = require('cheerio');
 const _ = require('underscore');
 const fs = require('fs');
 const request = require('request');
-const SlackWebhook = require('slack-webhook')
 const discord = require('discord-bot-webhook');
 
 var originalSoldOutItems = [];
@@ -14,36 +13,9 @@ const userAgentList = [];
 var restockCycles = 0;//do not change
 var refreshDelay = 30000//check every 30 seconds
 
-//uncomment for slack configuration
-// const slackWebhookURL = ''
-// const slack = new SlackWebhook(slackWebhookURL, {
-//   defaults: {
-//     username: 'Bot',
-//     channel: '#supreme-restocks',
-//     icon_emoji: ':robot_face:'
-//   }
-// })
-
-//uncomment if you need discord
+// discord webhook
 discord.hookId = '792080450087682068'; 
 discord.hookToken = 'RwvBDpk2GlsX52TEVI4iUtkA9hNeJNpsRF1oxar57LWAblWDFL9_Xl0C3SCzHUq-q27L';
-
-//uncomment if you need twitter
-// var client = new Twitter({
-//   consumer_key: '',
-//   consumer_secret: '',
-//   access_token_key: '',
-//   access_token_secret: ''
-// });
-
-//Uncomment if you need slack or discord or twitter output
-//slack.send('Now monitoring for restocks.')
-//discord.sendMessage('Now monitoring for restocks.');
-// client.post('statuses/update', {status: 'Now monitoring for restocks.'}, function(error, tweet, response) {
-//   if (!error) {
-//     console.log(tweet);
-//   }
-// });
 
 console.log('Now monitoring for restocks.');
 
@@ -95,9 +67,7 @@ function scrape(arr) {
               console.log('RESTOCK OCCURED!!!');
               var restockedItems = findArrayDifferences(originalSoldOutItems, newSoldOutItems);
               console.log(restockedItems)
-              //postToSlack(restockedItems)
               postToDiscord(restockedItems)
-              //postToTwitter(restockedItems)
               originalSoldOutItems = newSoldOutItems; //reset the variable
           }
 
@@ -136,22 +106,10 @@ function generateRandomUserAgent(){
   return {'User-Agent': userAgent}
 }
 
-function postToSlack(restockedItems){
-  for (let i = 0; i < restockedItems.length; i++) {
-    slack.send('http://www.supremenewyork.com' + restockedItems[i])
-  }
-}
 
 function postToDiscord(restockedItems){
   for (let i = 0; i < restockedItems.length; i++) {
     discord.sendMessage('http://www.supremenewyork.com' + restockedItems[i]);
-  }
-}
-
-function postToTwitter(restockedItems){
-   for (let i = 0; i < restockedItems.length; i++) {
-      client.post('statuses/update', {status: 'http://www.supremenewyork.com' + restockedItems[i]}, function(error, tweet, response) {
-    });
   }
 }
 
